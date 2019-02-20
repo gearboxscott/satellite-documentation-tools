@@ -57,13 +57,3 @@ DESTDIR=/var/tmp
 ## License
 
 ![](https://www.gnu.org/graphics/gplv3-with-text-136x68.png)GPL 3.0 or later.   https://www.gnu.org/licenses/gpl-3.0.en.html
-
-## History and REVISIONS
-
-| Version | Date       | Authors      | Changes                                |
-| :------ | :--------- | :----------- | -------------------------------------- |
-| 1.0.0   | 2019-02-14 | Scott Parker | Script Creation - In it's current Form |
-
-
-
-
