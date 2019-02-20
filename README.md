@@ -4,6 +4,8 @@ This is the beginning of a set of tool will assist in documenting the configurat
 
 `satellite-configuration-dump.sh`will dump out the internal objects of Satellite in a MarkDown or AsciiDoc format.  These format will allow the user to keep the document in it entire form or select segments of it to be incorporated into other documentation.
 
+It can be used as a diagnostic tool to check hidden values in the configuration or setup of the Satellite 6 Server. It can be run via cron to a dated file to track changes over time.  Use `diff` to see those changes.  Sometimes there are settings in Satellite 6 that are not apparent in the Web GUI that can be seen in this dump of the configuration.
+
 Download the program and make it executable.
 
 ```bash
@@ -37,6 +39,19 @@ To generate a AsciiDoc report of the configuration -- long option form
 
 ```bash
 ./satellite-configuration-dump.sh --organization ACME --listing ACME.adoc --type AD
+```
+
+To make a periodic dump of Satellite 6 Settings, add this to `/etc/cron.d`:
+
+```bash
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+SCRIPT=/root/bin/satellite-documentation-tools/satellite-configuration-dump.sh
+NOW=$(date +"%Y-%m=%d-%k:%M:%S")
+DESTDIR=/var/tmp
+
+# Clean up the session entries in the database
+* 0 * * *     root	$SCRIPT --organization ACME --type AD --listing $DESTDIR/ACME-${NOW}.md
 ```
 
 ## License
