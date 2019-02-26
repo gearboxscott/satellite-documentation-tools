@@ -660,7 +660,6 @@ fi
 
 echo Gathering information:
 # Content 
-get-info bash organization ""
 get-info bash location ""
 get-info-simple bash subscription $ORGANIZATION
 get-info bash product $ORGANIZATION
@@ -669,6 +668,7 @@ get-info bash sync-plan $ORGANIZATION
 get-info bash lifecycle-environment $ORGANIZATION
 get-info-content-view bash 'content views' $ORGANIZATION
 get-info bash 'content-view version' $ORGANIZATION
+get-info-simple bash 'host-collection' $ORGANIZATION
 get-info bash file $ORGANIZATION
 get-info bash gpg $ORGANIZATION
 get-info bash 'virt-who-config' $ORGANIZATION
