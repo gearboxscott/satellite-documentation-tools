@@ -46,16 +46,16 @@ Usage Examples:
 Long Method:
 
 $0 --h or $0 --help
-$0 --organization <name of organization> --listing <filename>.adoc --type <AD|MD>
+$0 --organization <ID of organization> --listing <filename>.adoc --type <AD|MD>
 
 Short Method: 
 
-$0 -o <name of organization> -l <filename>.adoc -t <AD|MD>
+$0 -o <ID of organization> -l <filename>.adoc -t <AD|MD>
 
 Options:
 
 -l | --listing filename.adoc          : name of file to store the output.
--o | --organization organization_name : name_of_organization in Satellite.
+-o | --organization organization_ID   : ID_of_organization in Satellite.
 -t | --type AD|MD                     : report types: AD (asciidoc) or MD (markdown)
 -h | --help                           : usage
 
@@ -173,7 +173,7 @@ function get-info () {
   LISTING_HEADER="${2}"
   ORG_OPT="${3}"
   
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   CNT=$(hammer --csv ${2} list ${ORG_OPT} | grep -iv ^Id | wc -l)
   if [ $CNT -eq 0 ] ; then return 0; fi
   echo ...${LISTING_HEADER}
@@ -202,7 +202,7 @@ function get-global-parameters () {
 
   echo ...${LISTING_HEADER}
   exec 3>&1 4>&2 1>>$OUTPUT 2>>$ERRORLOG
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   code-block-header "${LISTING_TYPE}" "${LISTING_HEADER}" 1 $REPORT_TYPE
   hammer global-parameter list --show-hidden yes
   code-block-footer  $REPORT_TYPE
@@ -216,7 +216,7 @@ function get-info-simple () {
   LISTING_HEADER="${2}"
   ORG_OPT="${3}"
 
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   CNT=$(hammer --csv ${2} list $ORG_OPT | grep -iv ^Id | wc -l)
   if [ $CNT -eq 0 ] ; then return 0; fi
   echo ...${LISTING_HEADER}
@@ -234,7 +234,7 @@ function get-ping () {
   LISTING_HEADER="${2}"
   ORG_OPT="${3}"
 
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   echo ...${LISTING_HEADER}
   exec 3>&1 4>&2 1>>$OUTPUT 2>>$ERRORLOG
   code-block-header "${LISTING_TYPE}" "${LISTING_HEADER}" 1 $REPORT_TYPE
@@ -249,31 +249,31 @@ function get-info-roles () {
   LISTING_TYPE="${1}"
   LISTING_HEADER="${2}"
   
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   CNT=$(hammer --csv ${2} list ${ORG_OPT} | grep -iv ^Id | wc -l)
   [ $CNT -eq 0 ] && return 0
   echo ...${LISTING_HEADER}
   exec 3>&1 4>&2 1>>$OUTPUT 2>>$ERRORLOG
-  hammer --csv location list --organization ${ORGANIZATION} | \
+  hammer --csv location list --organization-id ${ORGANIZATION} | \
   grep -iv ^Id | \
   awk -F, '{print $1}' | \
   while read ID
   do
     code-block-header "${LISTING_TYPE}" "${LISTING_HEADER}" 1 $REPORT_TYPE
-    hammer role list --organization ${ORGANIZATION}
+    hammer role list --organization-id ${ORGANIZATION}
     code-block-footer  $REPORT_TYPE
 
-    hammer --csv role list --organization ${ORGANIZATION} | \
+    hammer --csv role list --organization-id ${ORGANIZATION} | \
     grep -iv ^Id | \
     awk -F, '{print $1}' | \
     while read RID
     do
        code-block-header "${LISTING_TYPE}" "${LISTING_HEADER} Details" 2 $REPORT_TYPE
-       hammer role info --id ${RID} --organization ${ORGANIZATION}
+       hammer role info --id ${RID} --organization-id ${ORGANIZATION}
        code-block-footer  $REPORT_TYPE
        
        code-block-header "${LISTING_TYPE}" "${LISTING_HEADER} Filters" 2 $REPORT_TYPE
-       hammer role filters --id ${RID} --organization ${ORGANIZATION}
+       hammer role filters --id ${RID} --organization-id ${ORGANIZATION}
        code-block-footer  $REPORT_TYPE
     done
     echo ----------------------------------
@@ -289,7 +289,7 @@ function get-info-details () {
   LISTING_HEADER="${2}"
   ORG_OPT=""
   
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   CNT=$(hammer --csv ${2} list ${ORG_OPT} | grep -iv ^Id | wc -l)
   if [ $CNT -eq 0 ] ; then return 0; fi
   echo ...${LISTING_HEADER}
@@ -325,7 +325,7 @@ function get-info-compute-resources () {
   LISTING_HEADER="${2}"
   ORG_OPT="${3}"
   
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   CNT=$(hammer --csv ${2} list $ORG_OPT | grep -iv ^Id | wc -l)
   if [ $CNT -eq 0 ] ; then return 0; fi
   echo ...${LISTING_HEADER}
@@ -345,7 +345,7 @@ function get-info-compute-resources () {
     while read CID
     do
        code-block-header "${LISTING_TYPE}" "${LISTING_HEADER} Details" 2 $REPORT_TYPE
-       hammer compute-resource info --id ${CID} --organization ${ORG_OPT}
+       hammer compute-resource info --id ${CID} --organization-id ${ORG_OPT}
        code-block-footer  $REPORT_TYPE
        
        code-block-header "${LISTING_TYPE}" "${LISTING_HEADER} Images" 2 $REPORT_TYPE
@@ -364,7 +364,7 @@ function get-info-hostgroup () {
   LISTING_TYPE="${1}"
   LISTING_HEADER="${2}"
   
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   CNT=$(hammer --csv ${2} list $ORG_OPT | grep -iv ^Id | wc -l)
   if [ $CNT -eq 0 ] ; then return 0 ; fi
   echo ...${LISTING_HEADER}
@@ -412,7 +412,7 @@ function get-info-job-templates () {
 
   echo ...${LISTING_HEADER}
   exec 3>&1 4>&2 1>>$OUTPUT 2>>$ERRORLOG
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   hammer --csv location list ${ORG_OPT} | \
   grep -iv ^Id | \
   awk -F, '{print $1}' | \
@@ -451,7 +451,7 @@ function get-info-templates () {
 
   echo ...${LISTING_HEADER}
   exec 3>&1 4>&2 1>>$OUTPUT 2>>$ERRORLOG
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   hammer --csv location list ${ORG_OPT} | \
   grep -iv ^Id | \
   awk -F, '{print $1}' | \
@@ -490,7 +490,7 @@ function get-info-partition-table () {
   
   echo ...${LISTING_HEADER}
   exec 3>&1 4>&2 1>>$OUTPUT 2>>$ERRORLOG
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   hammer --csv location list ${ORG_OPT} | \
   grep -iv ^Id | \
   awk -F, '{print $1}' | \
@@ -525,21 +525,21 @@ function get-info-dump () {
   
   exec 3>&1 4>&2 1>>$OUTPUT 2>>$ERRORLOG
   code-block-header "${LISTING_TYPE}" "${LISTING_HEADER}" 1 $REPORT_TYPE
-  hammer ${2} list --organization ${ORGANIZATION}
+  hammer ${2} list --organization-id ${ORGANIZATION}
   echo ---[ DETAILS ]-------------------------------
-  hammer --csv ${2} list --organization ${ORGANIZATION} | \
+  hammer --csv ${2} list --organization-id ${ORGANIZATION} | \
   grep -iv ^Id | \
   awk -F, '{print $1}' | \
   while read ID
   do
-    hammer ${2} info --id ${ID} --organization ${ORGANIZATION}
+    hammer ${2} info --id ${ID} --organization-id ${ORGANIZATION}
   done
-  hammer --csv ${2} list --organization ${ORGANIZATION} | \
+  hammer --csv ${2} list --organization-id ${ORGANIZATION} | \
   grep -iv ^Id | \
   awk -F, '{print $2}' | \
   while read ID
   do
-    hammer ${2} dump --id ${ID} --organization ${ORGANIZATION}
+    hammer ${2} dump --id ${ID} --organization-id ${ORGANIZATION}
   done
   code-block-footer  $REPORT_TYPE
   exec 1>&3 3>&- 2>&4 4>&-
@@ -555,7 +555,7 @@ function get-info-content-view () {
   
   echo ...${LISTING_HEADER}
   exec 3>&1 4>&2 1>>$OUTPUT 2>>$ERRORLOG
-  [ ! -z "$3" ] && ORG_OPT="--organization ${3}"
+  [ ! -z "$3" ] && ORG_OPT="--organization-id ${3}"
   code-block-header "${LISTING_TYPE}" "${LISTING_HEADER}" 1 $REPORT_TYPE
   hammer content-view list $ORG_OPT
   echo ---[ DETAILS ]-------------------------------
